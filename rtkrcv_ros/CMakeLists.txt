@@ -36,7 +36,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES rtkrcv_ros
-  CATKIN_DEPENDS roscpp std_msgs message_runtime message_generation geometry_msgs
+  CATKIN_DEPENDS roscpp std_msgs message_runtime message_generation geometry_msgs nmea_msgs
   DEPENDS system_lib
 )
 
@@ -45,6 +45,9 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/include/rtklib
   ${PROJECT_SOURCE_DIR}/../../devel/include
 )
+
+# Set Compiler
+add_compile_options(-std=c++14)
 
 set(OPTION -DENAGLO -DENAGAL -DENAQZS -DENACMP -DTRACE -DNFREQ=3 -DNEXOBS=3)
 set(CFLAGS  -O3 -ansi -pedantic -Wno-unused-but-set-variable -Wno-unused-variable -Wno-unused-function ${OPTION} -g)

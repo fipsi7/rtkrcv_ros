@@ -504,6 +504,7 @@ static int decode_sol(char *buff, const solopt_t *opt, sol_t *sol, double *rb)
         
         /* for time update only */
         if (opt->posf!=SOLF_NMEA&&!strncmp(buff,"$GPRMC",6)) return 2;
+        if (opt->posf!=SOLF_NMEA_PSV&&!strncmp(buff,"$GPRMC",6)) return 2;
     }
     else { /* decode position record */
         if (!decode_solpos(buff,opt,sol)) return 0;
@@ -1386,6 +1387,8 @@ extern int outsolheads(unsigned char *buff, const solopt_t *opt)
     trace(3,"outsolheads:\n");
     
     if (opt->posf==SOLF_NMEA) return 0;
+
+    if (opt->posf==SOLF_NMEA_PSV) return 0;
     
     if (opt->outhead) {
         p+=sprintf(p,"%s (",COMMENTH);
@@ -1453,6 +1456,10 @@ extern int outsols(unsigned char *buff, const sol_t *sol, const double *rb,
         if (opt->nmeaintv[0]<0.0) return 0;
         if (!screent(sol->time,ts,ts,opt->nmeaintv[0])) return 0;
     }
+    if (opt->posf==SOLF_NMEA_PSV) {
+        if (opt->nmeaintv[0]<0.0) return 0;
+        if (!screent(sol->time,ts,ts,opt->nmeaintv[0])) return 0;
+    }
     if (sol->stat<=SOLQ_NONE||(opt->posf==SOLF_ENU&&norm(rb,3)<=0.0)) {
         return 0;
     }
@@ -1475,6 +1482,7 @@ extern int outsols(unsigned char *buff, const sol_t *sol, const double *rb,
         case SOLF_LLH:  p+=outpos (p,s,sol,opt);   break;
         case SOLF_XYZ:  p+=outecef(p,s,sol,opt);   break;
         case SOLF_ENU:  p+=outenu(p,s,sol,rb,opt); break;
+        case SOLF_NMEA_PSV:
         case SOLF_NMEA: p+=outnmea_rmc(p,sol);
                         p+=outnmea_gga(p,sol);
                         if(ssat!=NULL){
@@ -1504,6 +1512,10 @@ extern int outsolexs(unsigned char *buff, const sol_t *sol, const ssat_t *ssat,
     trace(3,"outsolexs:\n");
     
     if (opt->posf==SOLF_NMEA) {
+        if (opt->nmeaintv[1]<0.0) return 0;
+        if (!screent(sol->time,ts,ts,opt->nmeaintv[1])) return 0;
+    }
+    if (opt->posf==SOLF_NMEA_PSV) {
         if (opt->nmeaintv[1]<0.0) return 0;
         if (!screent(sol->time,ts,ts,opt->nmeaintv[1])) return 0;
     }
